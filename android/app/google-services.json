@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "843803161641",
+    "project_id": "melodyvault-a395e",
+    "storage_bucket": "melodyvault-a395e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:843803161641:android:3844ef9affc77830845838",
+        "android_client_info": {
+          "package_name": "com.example.evaluacion_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5jMhQmLXi1tJifsG5aMdmMxwvzYgzlSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
