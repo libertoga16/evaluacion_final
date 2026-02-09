@@ -21,6 +21,11 @@ class PlaylistService {
     return doc.exists ? Playlist.fromFirestore(doc) : null;
   }
 
+  Stream<Playlist?> getPlaylistStream(String id) {
+    return _firestore.collection(_collection).doc(id).snapshots()
+        .map((doc) => doc.exists ? Playlist.fromFirestore(doc) : null);
+  }
+
   Future<String> createPlaylist(Playlist playlist) async {
     final docRef = await _firestore.collection(_collection).add(playlist.toFirestore());
     return docRef.id;

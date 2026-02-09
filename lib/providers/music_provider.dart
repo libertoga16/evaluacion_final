@@ -11,6 +11,14 @@ class MusicProvider extends ChangeNotifier {
   final PlaylistService _playlistService = PlaylistService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
+  MusicProvider() {
+    _init();
+  }
+
+  void _init() {
+    seedDefaultSongs();
+  }
+  
   bool _isLoading = false;
   String? _error;
   List<String> _favoriteIds = [];
@@ -21,6 +29,7 @@ class MusicProvider extends ChangeNotifier {
 
   Stream<List<Song>> get songsStream => _songService.getSongs();
   Stream<List<Playlist>> getUserPlaylists(String userId) => _playlistService.getUserPlaylists(userId);
+  Stream<Playlist?> getPlaylistStream(String id) => _playlistService.getPlaylistStream(id);
 
   void initFavorites(String userId) {
     if (userId.isEmpty) return;

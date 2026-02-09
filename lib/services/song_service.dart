@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../models/song.dart';
@@ -70,8 +72,8 @@ class SongService {
   }
 
   Future<void> seedDefaultSongs() async {
-    final snapshot = await _firestore.collection(_collection).where('isDefault', isEqualTo: true).limit(1).get();
-    if (snapshot.docs.isNotEmpty) return;
+    print('SEEDING: Smart check for default songs...');
+
     final defaults = [
       Song(
         title: 'Bohemian Rhapsody', 
@@ -80,7 +82,7 @@ class SongService {
         genre: 'Rock', 
         duration: '5:55', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Bohemian_Rhapsody.png',
+        imageUrl: 'defaults/queen.jpg', // Will be resolved
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
       ),
       Song(
@@ -90,7 +92,7 @@ class SongService {
         genre: 'Rock', 
         duration: '6:30', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/4/49/Hotelcalifornia.jpg',
+        imageUrl: 'defaults/eagles.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
       ),
       Song(
@@ -100,7 +102,7 @@ class SongService {
         genre: 'Pop', 
         duration: '4:54', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/5/55/Michael_Jackson_-_Thriller.png',
+        imageUrl: 'defaults/michael_janson.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
       ),
       Song(
@@ -110,7 +112,7 @@ class SongService {
         genre: 'Rock', 
         duration: '5:01', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b7/NirvanaNevermindalbumcover.jpg',
+        imageUrl: 'defaults/Nirvana.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
       ),
       Song(
@@ -120,7 +122,7 @@ class SongService {
         genre: 'Pop', 
         duration: '3:53', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Shape_Of_You_%28Official_Single_Cover%29_by_Ed_Sheeran.png',
+        imageUrl: 'defaults/ed_Sheeran.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
       ),
       Song(
@@ -130,7 +132,7 @@ class SongService {
         genre: 'Pop', 
         duration: '3:20', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/e/e6/The_Weeknd_-_Blinding_Lights.png',
+        imageUrl: 'defaults/the_weeknd.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
       ),
       Song(
@@ -140,7 +142,7 @@ class SongService {
         genre: 'Rock', 
         duration: '8:02', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/2/26/Led_Zeppelin_-_Led_Zeppelin_IV.jpg',
+        imageUrl: 'defaults/Leed_Zepeelin.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
       ),
       Song(
@@ -150,12 +152,51 @@ class SongService {
         genre: 'Pop', 
         duration: '3:07', 
         isDefault: true, 
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/en/6/69/ImijohnL.jpg',
+        imageUrl: 'defaults/john_lennon.jpg',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
       ),
     ];
+
     for (final song in defaults) {
-      await addSong(song);
+      // 1. Check if this specific song already exists
+      final snapshot = await _firestore.collection(_collection)
+          .where('isDefault', isEqualTo: true)
+          .where('title', isEqualTo: song.title)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // DEDUPLICATION: If more than 1 exists, keep first, delete others
+        if (snapshot.docs.length > 1) {
+          print('Cleanup: Found ${snapshot.docs.length} copies of ${song.title}. Deleting extras...');
+          for (var i = 1; i < snapshot.docs.length; i++) {
+            await snapshot.docs[i].reference.delete();
+          }
+        }
+        print('Skipping ${song.title} (already exists)');
+        continue; 
+      }
+
+      // 2. If not exists, upload and create
+      try {
+        final localPath = 'assets/images/${song.imageUrl}';
+        final ByteData byteData = await rootBundle.load(localPath);
+        final Uint8List imageData = byteData.buffer.asUint8List();
+        
+        final fileName = song.imageUrl.split('/').last;
+        final ref = _storage.ref().child('defaults/$fileName');
+        
+        final metadata = SettableMetadata(contentType: 'image/jpeg');
+        await ref.putData(imageData, metadata);
+        final downloadUrl = await ref.getDownloadURL();
+        
+        await addSong(song.copyWith(imageUrl: downloadUrl));
+        print('CREATED: ${song.title}');
+        
+      } catch (e) {
+        print('ERROR SEEDING ${song.title}: $e');
+        // Fallback if local asset missing, use placeholder to not break app
+        await addSong(song.copyWith(imageUrl: 'https://picsum.photos/seed/${song.title}/300/300'));
+      }
     }
   }
 }

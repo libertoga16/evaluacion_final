@@ -60,17 +60,7 @@ class SongTileWidget extends StatelessWidget {
             ),
         ],
       ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w500)),
-          ),
-          if (hasAudio) Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Icon(Icons.play_circle, size: 18, color: AppColors.primary),
-          ),
-        ],
-      ),
+      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(subtitle, style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
       trailing: showActions ? PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),

@@ -53,7 +53,19 @@ class SongDetailScreen extends StatelessWidget {
                   Text(song.artist, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.primary)),
                   const SizedBox(height: 32),
                   
-                  if (song.audioUrl.isNotEmpty) 
+                  if (song.isDefault)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: AppColors.surfaceLight.withAlpha(50), borderRadius: BorderRadius.circular(12)),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.copyright, color: AppColors.error),
+                          SizedBox(width: 12),
+                          Expanded(child: Text('Audio no permitido por Copyright. ¡Sube tu propia música!', style: TextStyle(color: AppColors.textMuted))),
+                        ],
+                      ),
+                    )
+                  else if (song.audioUrl.isNotEmpty) 
                     AudioPlayerWidget(audioUrl: song.audioUrl, autoPlay: true)
                   else
                     Container(

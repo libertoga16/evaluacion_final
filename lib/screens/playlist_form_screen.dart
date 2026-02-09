@@ -7,6 +7,7 @@ import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/music_provider.dart';
 import '../../widgets/widgets.dart';
+import 'playlist_detail_screen.dart'; // Importante para la navegación
 
 class PlaylistFormScreen extends StatefulWidget {
   final Playlist? playlist;
@@ -60,23 +61,32 @@ class _PlaylistFormScreenState extends State<PlaylistFormScreen> {
       songIds: widget.playlist?.songIds ?? [],
     );
 
+    String? newId;
     bool success;
+    
     if (isEditing) {
+      newId = widget.playlist!.id;
       success = await music.updatePlaylist(playlist, _imageFile);
     } else {
-      success = await music.createPlaylist(playlist, _imageFile) != null;
+      newId = await music.createPlaylist(playlist, _imageFile);
+      success = newId != null;
     }
 
     setState(() => _isLoading = false);
+    
     if (mounted) {
-      if (success) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditing ? 'Playlist actualizada' : 'Playlist creada'), backgroundColor: AppColors.success),
-        );
+      if (success && newId != null) {
+        if (isEditing) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Playlist actualizada'), backgroundColor: AppColors.success));
+        } else {
+           // Al crear, navegamos directamente al detalle para que el usuario pueda añadir canciones
+           final newPlaylist = playlist.copyWith(id: newId, imageUrl: _imageFile != null ? '' : playlist.imageUrl);
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => PlaylistDetailScreen(playlist: newPlaylist)));
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(music.error ?? 'Error'), backgroundColor: AppColors.error),
+          SnackBar(content: Text(music.error ?? 'Error al guardar'), backgroundColor: AppColors.error),
         );
       }
     }

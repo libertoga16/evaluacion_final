@@ -15,123 +15,137 @@ class PlaylistDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<List<Song>>(
-        future: context.read<MusicProvider>().getSongsByIds(playlist.songIds),
-        builder: (context, snapshot) {
-          final songs = snapshot.data ?? [];
-          final isLoading = snapshot.connectionState == ConnectionState.waiting;
+    // Usamos un StreamBuilder para escuchar cambios en la playlist en tiempo real
+    return StreamBuilder<Playlist?>(
+      stream: context.read<MusicProvider>().getPlaylistStream(playlist.id!),
+      initialData: playlist,
+      builder: (context, playlistSnapshot) {
+        final currentPlaylist = playlistSnapshot.data;
 
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 300,
-                pinned: true,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PlaylistFormScreen(playlist: playlist))),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _confirmDelete(context),
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  centerTitle: true,
-                  title: Text(playlist.name, style: const TextStyle(shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                       if (playlist.imageUrl.isNotEmpty)
-                          CachedNetworkImage(imageUrl: playlist.imageUrl, fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken),
-                       if (playlist.imageUrl.isEmpty)
-                          Container(color: AppColors.surfaceLight, child: const Icon(Icons.queue_music, size: 100, color: AppColors.textMuted)),
-                       const DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                              colors: [Colors.transparent, Color(0xFF121212)],
-                              stops: [0.6, 1.0],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              if (playlist.description.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(playlist.description, style: const TextStyle(color: AppColors.textSecondary, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
-                  ),
-                ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('${songs.length} canciones', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                      TextButton.icon(
-                        onPressed: () => _showAddSongDialog(context),
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('Añadir canciones'),
+        if (currentPlaylist == null) {
+          return const Scaffold(body: Center(child: Text('Playlist no encontrada')));
+        }
+
+        return Scaffold(
+          body: FutureBuilder<List<Song>>(
+            // Obtenemos las canciones usando los IDs actualizados de la playlist
+            future: context.read<MusicProvider>().getSongsByIds(currentPlaylist.songIds),
+            builder: (context, songsSnapshot) {
+              final songs = songsSnapshot.data ?? [];
+              final isLoading = songsSnapshot.connectionState == ConnectionState.waiting;
+
+              return CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 300,
+                    pinned: true,
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PlaylistFormScreen(playlist: currentPlaylist))),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _confirmDelete(context, currentPlaylist),
                       ),
                     ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Text(currentPlaylist.name, style: const TextStyle(shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
+                      background: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                           if (currentPlaylist.imageUrl.isNotEmpty)
+                              CachedNetworkImage(imageUrl: currentPlaylist.imageUrl, fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken),
+                           if (currentPlaylist.imageUrl.isEmpty)
+                              Container(color: AppColors.surfaceLight, child: const Icon(Icons.queue_music, size: 100, color: AppColors.textMuted)),
+                           const DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                                  colors: [Colors.transparent, Color(0xFF121212)],
+                                  stops: [0.6, 1.0],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              if (isLoading)
-                const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
-              else if (songs.isEmpty)
-                const SliverFillRemaining(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text('Esta playlist está vacía.\n¡Añade algunas canciones!', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textMuted))),
+                  if (currentPlaylist.description.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(currentPlaylist.description, style: const TextStyle(color: AppColors.textSecondary, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
+                      ),
+                    ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${songs.length} canciones', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                          TextButton.icon(
+                            onPressed: () => _showAddSongDialog(context, currentPlaylist),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Añadir canciones'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final song = songs[index];
-                      return Dismissible(
-                        key: Key(song.id!),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: AppColors.error,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) {
-                          context.read<MusicProvider>().removeSongFromPlaylist(playlist.id!, song.id!);
+                  if (isLoading)
+                    const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+                  else if (songs.isEmpty)
+                    const SliverFillRemaining(
+                      child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Center(child: Text('Esta playlist está vacía.\n¡Añade algunas canciones!', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textMuted))),
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final song = songs[index];
+                          return Dismissible(
+                            key: Key('${currentPlaylist.id}-${song.id}'),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: AppColors.error,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            onDismissed: (_) {
+                              context.read<MusicProvider>().removeSongFromPlaylist(currentPlaylist.id!, song.id!);
+                            },
+                            child: SongTileWidget(
+                              title: song.title,
+                              subtitle: song.artist,
+                              imageUrl: song.imageUrl,
+                              hasAudio: song.audioUrl.isNotEmpty,
+                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SongDetailScreen(song: song))),
+                              showActions: true,
+                              onDelete: () => context.read<MusicProvider>().removeSongFromPlaylist(currentPlaylist.id!, song.id!),
+                            ),
+                          );
                         },
-                        child: SongTileWidget(
-                          title: song.title,
-                          subtitle: song.artist,
-                          imageUrl: song.imageUrl,
-                          hasAudio: song.audioUrl.isNotEmpty,
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SongDetailScreen(song: song))),
-                          showActions: true,
-                          onDelete: () => context.read<MusicProvider>().removeSongFromPlaylist(playlist.id!, song.id!),
-                        ),
-                      );
-                    },
-                    childCount: songs.length,
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 50)),
-            ],
-          );
-        },
-      ),
+                        childCount: songs.length,
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                ],
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
-  void _confirmDelete(BuildContext context) async {
+  void _confirmDelete(BuildContext context, Playlist playlist) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -149,7 +163,7 @@ class PlaylistDetailScreen extends StatelessWidget {
     }
   }
 
-  void _showAddSongDialog(BuildContext context) {
+  void _showAddSongDialog(BuildContext context, Playlist playlist) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -161,7 +175,7 @@ class PlaylistDetailScreen extends StatelessWidget {
           maxChildSize: 0.9,
           expand: false,
           builder: (_, controller) {
-            return _AddSongSheet(playlistId: playlist.id!, scrollController: controller);
+            return _AddSongSheet(playlist: playlist, scrollController: controller);
           },
         );
       },
@@ -170,9 +184,9 @@ class PlaylistDetailScreen extends StatelessWidget {
 }
 
 class _AddSongSheet extends StatefulWidget {
-  final String playlistId;
+  final Playlist playlist;
   final ScrollController scrollController;
-  const _AddSongSheet({required this.playlistId, required this.scrollController});
+  const _AddSongSheet({required this.playlist, required this.scrollController});
 
   @override
   State<_AddSongSheet> createState() => _AddSongSheetState();
@@ -192,9 +206,12 @@ class _AddSongSheetState extends State<_AddSongSheet> {
             stream: context.read<MusicProvider>().songsStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-              final songs = snapshot.data ?? [];
+              final allSongs = snapshot.data ?? [];
               
-              if (songs.isEmpty) return const Center(child: Text('No hay canciones disponibles'));
+              // Filtramos las canciones que ya están en la playlist
+              final songs = allSongs.where((s) => !widget.playlist.songIds.contains(s.id)).toList();
+              
+              if (songs.isEmpty) return const Center(child: Text('No hay canciones nuevas para añadir'));
 
               return ListView.builder(
                 controller: widget.scrollController,
@@ -213,7 +230,7 @@ class _AddSongSheetState extends State<_AddSongSheet> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle, color: AppColors.primary),
                       onPressed: () {
-                         context.read<MusicProvider>().addSongToPlaylist(widget.playlistId, song.id!);
+                         context.read<MusicProvider>().addSongToPlaylist(widget.playlist.id!, song.id!);
                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"${song.title}" añadida'), duration: const Duration(milliseconds: 800)));
                       },
                     ),
