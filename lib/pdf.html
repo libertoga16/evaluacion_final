@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUÍA MAESTRA DE DEFENSA: MELODYVAULT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300&family=Fira+Code:wght@400;500&family=Oswald:wght@400;500;700&display=swap');
+
+        :root {
+            --primary: #1565c0; /* Azul Ingeniero */
+            --secondary: #00838f; /* Cian Profundo */
+            --accent: #d84315;  /* Rojo Ladrillo intenso */
+            --auth-color: #6a1b9a; /* Púrpura Auth */
+            --service-color: #2e7d32; /* Verde Servicios */
+            --theme-color: #c2185b; /* Rosa Diseño */
+            --model-color: #fbc02d; /* Amarillo Modelos */
+            --opt-color: #009688;   /* Verde Optimizaciones */
+            --text: #263238;    /* Gris Oscuro Texto */
+            --code-bg: #eceff1; /* Gris Código */
+            --section-bg: #f5f5f5;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 2cm;
+                @bottom-center {
+                    content: "Página " counter(page);
+                }
+            }
+            body { 
+                font-size: 11pt; 
+                line-height: 1.5;
+                color: #000;
+                background: white;
+            }
+            .page-break { page-break-before: always; }
+            h1 { page-break-before: auto; }
+            h2, h3 { page-break-after: avoid; }
+            
+            /* CRITICAL FIXES FOR PAGINATION */
+            pre, .defense-tip, .screenshot { 
+                page-break-inside: avoid;
+                break-inside: avoid;
+                display: block;
+            }
+            
+            /* Better Screenshot Styling */
+            .screenshot {
+                max-width: 65%;       /* Slightly smaller to help flow */
+                max-height: 350px;
+                height: auto;
+                display: block;
+                margin: 15px auto;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                border-radius: 4px;
+                border: 1px solid #ddd;
+            }
+
+            .cover-page {
+                position: relative;
+                height: 297mm; /* Exact A4 height */
+                width: 100%;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                border: 8px solid var(--primary); /* Thinner border */
+                padding: 40px;
+                background: #fff;
+                page-break-after: always;
+                page-break-inside: avoid;
+                overflow: hidden; /* Cut off anything that spills */
+            }
+            
+            /* Force Blocks to start on new pages for coherence */
+            h1 { page-break-before: auto; margin-top: 40px; padding-top: 20px; }
+            /* h1:first-of-type { page-break-before: auto; } Removed */
+            .toc { page-break-after: always; }
+            a { text-decoration: none; color: black; }
+            .toc-link { color: #000; text-decoration: none; }
+            .toc-link:after { content: leader('.') target-counter(attr(href), page); }
+        }
+
+        body {
+            font-family: 'Merriweather', serif;
+            color: var(--text);
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: justify;
+            background-color: #ffffff;
+        }
+
+        /* TIPOGRAFÍA */
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 32pt;
+            text-transform: uppercase;
+            color: var(--primary);
+            border-bottom: 5px solid var(--accent);
+            padding-bottom: 15px;
+            margin-top: 60px;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 22pt;
+            color: #37474f;
+            margin-top: 50px;
+            border-left: 8px solid var(--secondary);
+            padding-left: 20px;
+        }
+
+        h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 14pt;
+            font-weight: 900;
+            color: var(--accent);
+            margin-top: 35px;
+            text-transform: uppercase;
+        }
+        
+        h4 {
+             font-family: 'Fira Code', monospace;
+             font-size: 12pt;
+             color: #455a64;
+             margin-top: 25px;
+             font-weight: bold;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 11pt;
+            line-height: 1.8;
+        }
+
+        /* ÍNDICE */
+        .toc {
+            background-color: var(--section-bg);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .toc-item {
+            margin-bottom: 15px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14pt;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .toc-subitem {
+            margin-left: 30px;
+            margin-bottom: 8px;
+            font-family: 'Merriweather', serif;
+            font-size: 11pt;
+            color: #546e7a;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        /* CLASES ESPECIALES */
+        .defense-tip {
+            background-color: #e3f2fd;
+            border: 2px solid var(--primary);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+        }
+        .defense-tip strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14pt;
+        }
+
+        .color-sample {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
+
+        /* CÓDIGO */
+        pre {
+            background-color: var(--code-bg);
+            font-family: 'Fira Code', monospace;
+            padding: 25px;
+            border-radius: 5px;
+            font-size: 9pt;
+            overflow-x: auto;
+            border: 1px solid #cfd8dc;
+            margin: 25px 0;
+        }
+
+        /* CAPTURAS */
+        .screenshot-placeholder {
+            width: 100%;
+            height: 450px;
+            border: 3px dashed #b0bec5;
+            background-color: #f1f8e9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 50px 0;
+            page-break-inside: avoid;
+        }
+        .placeholder-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16pt;
+            color: #78909c;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* PORTADA */
+        .cover-page {
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 15px solid var(--primary);
+            padding: 60px;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTADA -->
+    <div class="cover-page">
+        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="border: none; font-size: 50pt; margin-bottom: 10px; color: black; line-height: 1; page-break-before: avoidance;">GUÍA MAESTRA<br>DE DESARROLLO</h1>
+            <h2 style="border: none; font-size: 24pt; color: var(--accent); margin-top: 10px;">EVALUACIÓN FINAL: MELODYVAULT</h2>
+            
+            <div style="margin-top: 60px; font-size: 14pt; text-align: left; width: 100%; border-left: 5px solid var(--secondary); padding-left: 20px; display: inline-block; margin-left: auto; margin-right: auto; max-width: 60%;">
+                <p><strong>AUTOR:</strong> Liberto Guillén Álvarez</p>
+                <p><strong>CURSO:</strong> 2º DAM (Multiplataforma)</p>
+                <p><strong>AÑO:</strong> 2025 - 2026</p>
+                <p><strong>STACK:</strong> Flutter 3.x • Firebase • Dart</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREFACIO -->
+    <div class="page-break"></div>
+    <h1>INTRODUCCIÓN</h1>
+    <p>
+        Este documento constituye la defensa técnica y estética completa del proyecto MelodyVault.
+        Hemos desglosado el sistema en <strong>11 BLOQUES DE INGENIERÍA</strong>, cubriendo desde la infraestructura hasta el modelo de datos, la gestión de estado y las optimizaciones finales.
+    </p>
+
+    <!-- ÍNDICE -->
+    <div class="page-break"></div>
+    <h1>ÍNDICE DE CONTENIDOS</h1>
+    <div class="toc">
+        <div class="toc-item">INTRODUCCIÓN: MANUAL DE SUPERVIVENCIA
+            <div class="toc-subitem">Conceptos Básicos (Flutter, Dart, Firebase)</div>
+            <div class="toc-subitem">Metáfora de Construcción</div>
+        </div>
+
+        <div class="toc-item">CAPÍTULO 0: GÉNESIS DEL PROYECTO
+            <div class="toc-subitem">0.1 Instalación y Requisitos (SDK)</div>
+            <div class="toc-subitem">0.2 Creación del Proyecto (CLI)</div>
+        </div>
+        
+        <div class="toc-item">BLOQUE 1: INFRAESTRUCTURA DE FIREBASE
+            <div class="toc-subitem">1.1 Configuración Nativa (Gradle & Info.plist)</div>
+            <div class="toc-subitem">1.2 Consola: Índices Compuestos y Estructura</div>
+            <div class="toc-subitem">1.3 Reglas de Seguridad (Storage & Firestore)</div>
+            <div class="toc-subitem">1.4 Vinculación CLI (flutterfire)</div>
+        </div>
+
+        <div class="toc-item" style="color: var(--model-color);">BLOQUE 2: ESTRUCTURA DE DATOS (MODELOS)
+            <div class="toc-subitem">2.1 Clase Song: Inmutabilidad y Serialización</div>
+            <div class="toc-subitem">2.2 Clase Playlist: Relaciones Referenciales</div>
+            <div class="toc-subitem">2.3 Interfaces Factory y CopyWith</div>
+        </div>
+
+        <div class="toc-item" style="color: var(--service-color);">BLOQUE 3: ARQUITECTURA DE SERVICIOS
+            <div class="toc-subitem">3.1 Patrón Singleton e Inyección de Dependencias</div>
+            <div class="toc-subitem">3.2 AuthService: Protocolo Auth y Mapeo de Errores</div>
+            <div class="toc-subitem">3.3 SongService: Mapeo de Streams y Snapshots</div>
+            <div class="toc-subitem">3.4 PlaylistService: Gestión Relacional (Arrays)</div>
+            <div class="toc-subitem">3.5 MusicProvider: Orquestador de Estado</div>
+        </div>
+
+        <div class="toc-item" style="color: var(--theme-color);">BLOQUE 4: DISEÑO Y ESTÉTICA (APP THEME)
+            <div class="toc-subitem">4.1 Psicología del Color (Verde Spotify)</div>
+            <div class="toc-subitem">4.2 Sistema de Tipografía (Google Fonts Outfit)</div>
+            <div class="toc-subitem">4.3 Dark Mode: Justificación Ergonómica</div>
+            <div class="toc-subitem">4.4 Componentes Visuales (Inputs, Cards, Pilss)</div>
+        </div>
+
+        <div class="toc-item" style="color: var(--auth-color);">BLOQUE 5: SISTEMA DE AUTENTICACIÓN
+            <div class="toc-subitem">5.1 AuthProvider: Estado Global y NotifyListeners</div>
+            <div class="toc-subitem">5.2 LoginScreen: UX, Feedback Visual y SnackBar</div>
+            <div class="toc-subitem">5.3 RegisterScreen: Validaciones Regex y Formularios</div>
+            <div class="toc-subitem">5.4 ForgotPasswordScreen: Flujo de Recuperación</div>
+            <div class="toc-subitem">5.5 Persistencia de Sesión (AuthWrapper)</div>
+        </div>
+
+        <div class="toc-item">BLOQUE 6: INGENIERÍA DE COMPONENTES
+            <div class="toc-subitem">6.1 SongTileWidget: ListTiles Inteligentes</div>
+            <div class="toc-subitem">6.2 PlaylistCardWidget: Grids, Stacks y Gradientes</div>
+            <div class="toc-subitem">6.3 AudioWidgets: Sliders y Botones de Estado</div>
+        </div>
+
+        <div class="toc-item">BLOQUE 7: INGENIERÍA DE PANTALLAS (CORE UI)
+            <div class="toc-subitem">7.1 HomeScreen: Shell, BottomNavBar e IndexedStack</div>
+            <div class="toc-subitem">7.2 PlaylistsScreen: GridView Builder y Responsive</div>
+            <div class="toc-subitem">7.3 SongDetailScreen: AudioLogic y State Management</div>
+            <div class="toc-subitem">7.4 PlaylistDetailScreen: Slivers, CustomScrollView y Joins</div>
+        </div>
+
+        <div class="toc-item">BLOQUE 8: RECURSOS Y CREACIÓN
+            <div class="toc-subitem">8.1 SongFormScreen: Pickers y Controladores</div>
+            <div class="toc-subitem">8.2 Subida Dual (Storage + DB): Algoritmo de 3 pasos</div>
+        </div>
+
+        <div class="toc-item">BLOQUE 9: GESTIÓN CRUD Y CIERRE
+            <div class="toc-subitem">9.1 Edición Inmutable con copyWith</div>
+            <div class="toc-subitem">9.2 Borrado en Cascada (Storage + DB)</div>
+            <div class="toc-subitem">9.3 Widget Dismissible (UX de Deslizamiento)</div>
+            <div class="toc-subitem">9.4 Gestión de Favoritos (Subcolecciones)</div>
+        </div>
+
+        <div class="toc-item" style="color: var(--opt-color);">BLOQUE 10: OPTIMIZACIONES Y UX AVANZADA
+            <div class="toc-subitem">10.1 Gestión de Memoria (CachedNetworkImage)</div>
+            <div class="toc-subitem">10.2 Búsqueda Animada (AnimatedSearchBar)</div>
+            <div class="toc-subitem">10.3 Estados Vacíos (EmptyStateWidget)</div>
+        </div>
+
+        <div class="toc-item">BLOQUE 11: CONCLUSIONES Y FUTURO
+            <div class="toc-subitem">11.1 Conclusiones Técnicas</div>
+            <div class="toc-subitem">11.2 Líneas Futuras de Desarrollo</div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- INTRODUCCIÓN: MANUAL DE SUPERVIVENCIA -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>INTRODUCCIÓN: MANUAL DE SUPERVIVENCIA</h1>
+    <p>
+        Si eres nuevo en esto, bienvenido. Antes de ver código, entendamos las herramientas que vamos a usar con analogías simples.
+    </p>
+
+    <h2>La "Santísima Trinidad" del Desarrollo</h2>
+    <ul>
+        <li><strong>Flutter (El Pintor):</strong> Imagina que tienes una caja de LEGOs infinitos. Flutter son las piezas (llamadas <strong>Widgets</strong>). Botones, textos, columnas... todo son piezas visuales que "pintan" la pantalla.</li>
+        <li><strong>Dart (El Cerebro):</strong> Las piezas de LEGO no se mueven solas. Dart es el lenguaje que les da vida. Es quien dice "Si toco este botón rojo (Flutter), entonces suena música (Lógica Dart)".</li>
+        <li><strong>Firebase (La Mochila en la Nube):</strong> Tu móvil tiene poco espacio. Firebase es una mochila mágica de Google en internet donde guardamos las fotos de las canciones, los archivos MP3 y los datos de los usuarios.</li>
+    </ul>
+
+    <h2>Metáfora de Construcción</h2>
+    <p>
+        Esta guía está ordenada de forma lógica, como si construyéramos una casa. <strong>No te saltes pasos.</strong>
+    </p>
+    <ol>
+        <li><strong>Cimientos (Bloques 0-1):</strong> Preparamos el terreno (Configuración) y los planos (Modelos). Sin esto, la casa se cae.</li>
+        <li><strong>Fontanería (Bloque 3):</strong> Las tuberías por donde viaja el agua (Datos). Son los Servicios. Nadie los ve, pero son vitales.</li>
+        <li><strong>Electricidad (Bloque 5):</strong> El sistema de seguridad. Quién entra y quién sale (Autenticación).</li>
+        <li><strong>Decoración (Bloque 4 y 6):</strong> Pintura y muebles (Diseño y Widgets).</li>
+        <li><strong>Habitaciones (Bloque 7):</strong> Las estancias finales donde vive el usuario (Pantallas).</li>
+    </ol>
+
+    <div class="defense-tip">
+        <strong>CONSEJO PRO:</strong>
+        "No intentes entender la pantalla final (Bloque 7) si no entiendes de dónde vienen los datos (Bloque 3). La programación es una cadena."
+    </div>
+
+    <!-- ============================================== -->
+    <!-- CAPÍTULO 0: GÉNESIS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>CAPÍTULO 0: GÉNESIS DEL PROYECTO</h1>
+    <p>Antes de escribir una sola línea de código, necesitamos preparar el entorno. Aquí explicamos cómo nace MelodyVault desde cero.</p>
+
+    <h2>0.1 Requisitos Previos</h2>
+    <p>Para ejecutar este proyecto, el entorno de desarrollo debe contar con:</p>
+    <ul>
+        <li><strong>Flutter SDK:</strong> (Versión Stable 3.x) añadido al PATH del sistema.</li>
+        <li><strong>VS Code:</strong> Con extensiones oficiales de Dart y Flutter.</li>
+        <li><strong>Android Studio:</strong> Necesario solo para las herramientas de compilación (Gradle) y emuladores.</li>
+    </ul>
+
+    <h2>0.2 Creación del Proyecto</h2>
+    <p>
+        El proyecto no se crea manualmente archivo por archivo. Utilizamos la CLI (Línea de Comandos) de Flutter para generar el esqueleto estándar ("Scaffold") recomendado por Google.
+    </p>
+
+    <h3>Comando Ejecutado (Anatomía del comando)</h3>
+    <pre>flutter create -t app --org com.liberto.melodyvault --platforms android,ios evaluacion_final</pre>
+    
+    <p>Hemos utilizado flags específicos para profesionalizar la estructura desde el segundo cero:</p>
+    <ul>
+        <li><strong>--org com.liberto.melodyvault:</strong> Define el "Domain Reverse Notation". Esto es crítico porque genera el <code>applicationId</code> en Android y el <code>Bundle ID</code> en iOS. Si no lo definimos ahora, cambiarlo después requiere tocar más de 15 archivos de configuración nativa y puede romper la vinculación con Firebase.</li>
+        <li><strong>--platforms android,ios:</strong> Por defecto, Flutter crea carpetas para Web, Linux, Windows y MacOS. Al limitar las plataformas, mantenemos el proyecto limpio y reducimos el tiempo de indexado del IDE.</li>
+        <li><strong>-t app:</strong> Especifica que estamos creando una aplicación final, no un plugin o un paquete.</li>
+    </ul>
+
+    <h3>Estructura de Carpetas Generada</h3>
+    <ul>
+        <li><strong>/android & /ios:</strong> Contienen los proyectos nativos reales. Flutter simplemente "inyecta" su motor gráfico en estos contenedores. Aquí es donde configuramos permisos (cámara, internet) y certificados de firma.</li>
+        <li><strong>/lib:</strong> El corazón del proyecto. Aquí vive el 100% de nuestro código Dart.</li>
+        <li><strong>pubspec.yaml:</strong> El gestor de dependencias. Es el equivalente al <code>package.json</code> de Node.js o el <code>pom.xml</code> de Java. Aquí declaramos versiones exactas de librerías para evitar conflictos.</li>
+    </ul>
+    <img src="../assets/images/1.png" class="screenshot">
+
+    <div class="defense-tip">
+        <strong>DEFENSA ORAL:</strong>
+        "La elección de las banderas de creación no fue aleatoria. Al definir la organización y las plataformas desde el inicio, evitamos deuda técnica y aseguramos que el identificador único de la app sea coherente en todas las tiendas de aplicaciones."
+    </div>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 1: INFRAESTRUCTURA (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 1: INFRAESTRUCTURA DE FIREBASE</h1>
+    <p>
+        En este bloque analizamos la fontanería invisible que conecta la app con la nube. No es solo "crear un proyecto", es configurar el entorno nativo compilado.
+    </p>
+
+    <h2>1.1 Configuración Nativa (Gradle & Info.plist)</h2>
+    <p>
+        Para que Firebase funcione en Android, necesitamos inyectar servicios de Google en el proceso de compilación de Gradle.
+    </p>
+    <h3>Archivo: android/app/build.gradle</h3>
+    <p>
+        Piensa en este archivo como el <strong>DNI o Pasaporte</strong> de tu aplicación. Define quién es la app (`applicationId`) y qué "idiomas" habla (versiones de Android).
+    </p>
+    <p>
+        Hemos elevado la <code>minSdkVersion</code> a **21** (Android 5.0 Lollipop) porque las librerías modernas de Firebase no soportan versiones anteriores (MultiDex issue).
+    </p>
+    <pre>
+defaultConfig {
+    applicationId "com.liberto.melodyvault.evaluacion_final"
+    minSdkVersion 21
+    targetSdkVersion flutter.targetSdkVersion
+}
+    </pre>
+
+    <h3>Archivo: ios/Runner/GoogleService-Info.plist</h3>
+    <p>
+        En iOS, este archivo actúa como el DNI de la aplicación. Contiene las claves API públicas que permiten a la app "presentarse" ante los servidores de Google Auth.
+    </p>
+
+    <h2>1.2 Índices Compuestos en Firestore</h2>
+    <p>
+        <strong>El Problema:</strong> Firestore indexa cada campo individualmente. Un filtro (`WHERE userId == ...`) y una ordenación (`ORDER BY createdAt`) requieren cruzar dos índices.
+    </p>
+    <p>
+        <strong>La Solución:</strong> Debemos ir a la pestaña "Indexes" en la consola y crear un índice compuesto (Composite Index) para los campos `userId` (Ascendente) y `createdAt` (Descendente).
+    </p>
+    <div class="defense-tip">
+        <strong>DEFENSA TÉCNICA:</strong>
+        "La creación de índices manuales demuestra que entendemos las limitaciones de rendimiento de las bases NoSQL. Sin el índice, la consulta requeriría escanear toda la colección, lo cual es O(N) en lugar de O(1)."
+    </div>
+    <img src="../assets/images/2.png" class="screenshot">
+
+    <h2>1.3 Reglas de Seguridad (Storage)</h2>
+    <p>No podemos dejar el cubo de archivos abierto al mundo. Hemos configurado reglas en lenguaje CEL:</p>
+    <pre>
+allow read, write: if request.auth != null;
+    </pre>
+
+    <h2>1.4 Vinculación: FlutterFire CLI</h2>
+    <pre>flutterfire configure --project=melodyvault-id</pre>
+    <img src="../assets/images/3.png" class="screenshot">
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 2: MODELOS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1 style="color: var(--model-color);">BLOQUE 2: ARQUITECTURA DE DATOS (FIREBASE & MODELOS)</h1>
+    
+    <h2>2.0 Filosofía NoSQL (Cloud Firestore)</h2>
+    <p>
+        A diferencia de una base de datos SQL tradicional (como MySQL) donde tenemos tablas rígidas y relaciones estrictas, Firestore es una base de datos <strong>NoSQL orientada a documentos</strong>.
+    </p>
+    <ul>
+        <li><strong>Colecciones:</strong> Son contenedores (similares a carpetas) que agrupan documentos. Ejemplo: <code>songs</code>, <code>users</code>.</li>
+        <li><strong>Documentos:</strong> Son objetos JSON flexibles. Cada documento puede tener campos diferentes, aunque en nuestra app forzamos una estructura coherente mediante código.</li>
+        <li><strong>Escalabilidad:</strong> Elegimos Firestore porque escala horizontalmente. El tiempo de lectura de una consulta depende del tamaño del resultado, NO del tamaño total de la base de datos. Leer 10 canciones tarda lo mismo si hay 100 o 100 millones de canciones almacenadas.</li>
+    </ul>
+    <img src="../assets/images/4.png" class="screenshot">
+
+    <h2>2.1 Modelos como ODMs (Object Document Mappers)</h2>
+    <p>
+        Como Firestore devuelve JSON puro (`Map&lt;String, dynamic&gt;`), necesitamos una capa intermedia que transforme esos datos "crudos" en objetos Dart seguros y tipados.
+        Los modelos en `lib/models/` son clases que actúan como contrato entre la Base de Datos (JSON) y la UI (Objetos).
+    </p>
+
+    <h2>2.1 Clase Song: Inmutabilidad y Serialización</h2>
+    <p>
+        La clase <code>Song</code> tiene todos sus campos <code>final</code>. Esto significa que una vez creada una instancia de una canción, no se puede modificar. Esta <strong>Inmutabilidad</strong> previene errores de estado (side-effects) difíciles de rastrear.
+    </p>
+
+    <h3>Serialización (fromFirestore / toFirestore)</h3>
+    <p>
+        No mezclamos la conversión de datos en las pantallas. La clase es responsable de saber cómo convertirse a sí misma.
+    </p>
+    <pre>
+// Método de Fábrica (Constructor Nombrado)
+factory Song.fromFirestore(DocumentSnapshot doc) {
+  final data = doc.data() as Map&lt;String, dynamic&gt;;
+  return Song(
+    id: doc.id, // El ID no está en el JSON, viene del metadato del documento
+    title: data['title'] ?? '', // Operador Null Coalescing para evitar NullPointers
+    createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+  );
+}
+    </pre>
+    <div class="defense-tip">
+        <strong>DEFENSA:</strong> "Uso el operador <code>??</code> (Null Coalescing) exhaustivamente. Si la base de datos devuelve un nulo por error, la app NO crashea, sino que asigna un valor por defecto seguro (cadena vacía)."
+    </div>
+
+    <h3>Patrón copyWith</h3>
+    <p>
+        Como los objetos son inmutables (`final`), para "editar" una canción no cambiamos su título. Creamos un <strong>CLON</strong> de la canción antigua con el título nuevo.
+    </p>
+    <pre>
+Song copyWith({String? title, String? artist...}) {
+  return Song(
+    title: title ?? this.title, // Si pasas null, mantengo el valor viejo
+    artist: artist ?? this.artist,
+    ...
+  );
+}
+    </pre>
+
+    <h2>2.2 Clase Playlist: Relaciones Referenciales</h2>
+    <p>
+        En una base de datos Relacional (SQL) tendríamos una tabla intermedia `PlaylistSongs`. 
+        En NoSQL, optimizamos para lectura incrustando un array de IDs directamente en la playlist.
+    </p>
+    <ul>
+        <li><code>final List&lt;String&gt; songIds;</code>: Solo guardamos las referencias, no duplicamos los datos de las canciones.</li>
+        <li><code>int get songCount => songIds.length;</code>: Un "getter calculado" que nos da información derivada instantánea sin ocupar espacio en memoria.</li>
+    </ul>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 3: SERVICIOS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1 style="color: var(--service-color);">BLOQUE 3: ARQUITECTURA DE SERVICIOS (BACKEND)</h1>
+    <p>
+        Entramos en el cerebro de la aplicación. Aquí la lógica es pura, sin contaminación visual de Widgets. Los servicios son la abstracción de la base de datos.
+    </p>
+
+    <h2>3.1 Patrón Singleton</h2>
+    <p>
+        El patrón Singleton es como la regla de la película <em>Los Inmortales</em>: <strong>"Solo puede quedar uno"</strong>.
+    </p>
+    <p>
+        Aunque usamos `Provider` para inyectar servicios, internamente <code>FirebaseFirestore.instance</code> utiliza este patrón. Esto garantiza que solo haya <strong>una conexión de socket abierta</strong> con el servidor de Google, independientemente de cuántas veces llamemos a la base de datos. Eficiencia de memoria pura.
+    </p>
+
+    <h2>3.2 AuthService: Protocolo Auth</h2>
+    <p>
+        Este servicio encapsula <code>FirebaseAuth</code>. Su función crítica es mapear los errores crípticos de Firebase a un lenguaje humano.
+    </p>
+    <pre>
+// auth_service.dart
+Future&lt;void&gt; signIn(String email, String password) async {
+  try {
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') throw 'No existe cuenta con ese email.';
+    if (e.code == 'wrong-password') throw 'Contraseña incorrecta.';
+    throw 'Error desconocido: ${e.message}';
+  }
+}
+    </pre>
+
+    <h2>3.3 SongService: Mapeo de Streams</h2>
+    <p>
+        El método <code>getSongs()</code> es una tubería de datos viva. No pedimos los datos una vez; nos "suscribimos" a ellos.
+    </p>
+    <h3>Transformación de Datos (.map)</h3>
+    <pre>
+Stream&lt;List&lt;Song&gt;&gt; getSongs() {
+  return _firestore.collection('songs')
+      .orderBy('createdAt', descending: true)
+      .snapshots() // FLUJO DE DATOS, NO FUTURE
+      .map((snapshot) {
+        return snapshot.docs.map((doc) => Song.fromFirestore(doc)).toList();
+      });
+}
+    </pre>
+    <div class="defense-tip">
+        <strong>DEFENSA:</strong> "¿Por qué .map?": Porque desacopla nuestra UI del formato JSON. Si mañana cambiamos de Firebase a SQL, solo cambiamos el servicio, no las pantallas.
+    </div>
+
+    <h2>3.4 PlaylistService: Gestión Relacional</h2>
+    <p>
+        Aquí manejamos la complejidad de relacionar entidades en NoSQL. Una Playlist guarda un array de strings `['songID1', 'songID2']`.
+        Usamos `FieldValue.arrayUnion()` para añadir canciones, lo que garantiza que no haya duplicados (Set matemático) en la operación atómica de servidor.
+    </p>
+
+    <h2>3.5 MusicProvider: Orquestador de Estado</h2>
+    <p>
+        Los servicios (SongService, PlaylistService) son "tontos": solo saben traer datos crudos. La lógica de negocio real vive en <code>MusicProvider</code>.
+    </p>
+    <ul>
+        <li><strong>Gestión de Carga (isLoading):</strong> Centralizamos el estado de carga aquí. Cuando empezamos a subir una canción, ponemos <code>_isLoading = true</code> y notificamos a la UI para que bloquee los botones.</li>
+        <li><strong>Manejo de Errores (Error Handling):</strong> Si algo falla en el servicio, el Provider captura la excepción (`try/catch`), la guarda en una variable `_error` y la UI reacciona mostrando un SnackBar, sin crashear.</li>
+    </ul>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 4: THEME (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1 style="color: var(--theme-color);">BLOQUE 4: DISEÑO Y ESTÉTICA (APP THEME)</h1>
+    <p>
+        MelodyVault implementa un sistema de diseño propio ("Design System") en <code>lib/config/app_theme.dart</code>.
+        Piensa en esto como el <strong>Manual de Identidad Corporativa</strong> de una empresa. Define las reglas que todos los diseñadores deben seguir.
+    </p>
+
+    <h2>4.1 Psicología del Color (Verde Spotify)</h2>
+    <p>
+        Hemos elegido una paleta basada en el líder del mercado para que el usuario sienta familiaridad inmediata.
+    </p>
+    <ul>
+        <li>
+            <span class="color-sample" style="background: #1DB954;"></span>
+            <strong>Verde Principal (0xFF1DB954):</strong> Color asociado a la energía, creatividad y "acción" (Play). Destaca sobre el fondo oscuro sin deslumbrar (bajo contraste relativo pero alta saturación).
+        </li>
+        <li>
+            <span class="color-sample" style="background: #121212;"></span>
+            <strong>Fondo Profundo (0xFF121212):</strong> No es negro puro (#000000). Material Design recomienda #121212 para evitar el "ghosting" (estelas) en pantallas OLED al hacer scroll.
+        </li>
+        <li>
+            <span class="color-sample" style="background: #E91E63;"></span>
+            <strong>Error (0xFFE91E63):</strong> Un rosa/rojo vibrante para alertas críticas, manteniendo el estilo moderno "neón".
+        </li>
+    </ul>
+
+    <h2>4.2 Sistema de Tipografía (Google Fonts Outfit)</h2>
+    <p>
+        Usamos la fuente <strong>Outfit</strong>. Es una tipografía geométrica sans-serif moderna.
+        Funciona excelente en pantallas móviles por su "x-height" generosa, lo que hace que los textos pequeños (títulos de canciones) sean legibles.
+    </p>
+    <!-- Imagen Typografía no disponible -->
+
+    <h2>4.3 Dark Mode: Justificación Ergonómica</h2>
+    <p>
+        La app fuerza el modo oscuro (`Brightness.dark`). En aplicaciones de consumo de medios, el modo oscuro reduce la fatiga visual (Eye Strain) del usuario que suele escuchar música de noche.
+    </p>
+
+    <h2>4.4 Componentes Visuales (Inputs, Cards)</h2>
+    <p>
+        <strong>Inputs:</strong> Tienen un fondo `AppColors.surfaceLight` (Gris medio) para indicar interactividad.
+        <strong>Botones (Pills):</strong> Usamos `BorderRadius.circular(24)` para botones completamente redondos, más amigables al tacto.
+    </p>
+    <img src="../assets/images/6.png" class="screenshot">
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 5: AUTH (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1 style="color: var(--auth-color);">BLOQUE 5: SISTEMA DE AUTENTICACIÓN</h1>
+    <p>
+        La puerta de entrada. Analizamos cómo gestionamos la identidad del usuario.
+    </p>
+
+    <h2>5.1 AuthProvider: Estado Global</h2>
+    <p>
+        Usamos <code>ChangeNotifier</code> para exponer el estado de la sesión a toda la app.
+        Contiene una variable privada `_user`. Cuando esta cambia, llamamos a `notifyListeners()`, lo que provoca que el `MaterialApp` en el `main.dart` redibuje la ruta inicial (de Login a Home).
+    </p>
+
+    <h2>5.2 LoginScreen: UX y Feedback</h2>
+    <p>
+        La pantalla <code>LoginScreen</code> no es solo dos inputs. Tiene gestión de estado local (`_isLoading`).
+    </p>
+    <ul>
+        <li><strong>Carga:</strong> Cuando el usuario pulsa "Entrar", el botón se reemplaza por un `CircularProgressIndicator`. Esto evita que el usuario pulse 20 veces mientras espera.</li>
+        <li><strong>Visibilidad Password:</strong> Un <code>IconButton</code> con un icono de ojo (`Icons.visibility`) alterna la propiedad `obscureText` del input.</li>
+        <li><strong>Feedback de Error:</strong> Usamos <code>ScaffoldMessenger.of(context).showSnackBar()</code> para mostrar alertas rojas flotantes si el login falla.</li>
+    </ul>
+    <img src="../assets/images/7.jpeg" class="screenshot">
+
+    <h2>5.3 RegisterScreen: Validaciones Regex</h2>
+    <p>
+        Utilizamos <code>TextFormField</code> con validadores estrictos.
+    </p>
+    <pre>
+validator: (value) {
+  if (value == null || !value.contains('@')) {
+    return 'Introduce un email válido';
+  }
+  return null;
+}
+    </pre>
+    <p>
+        La validación ocurre en el cliente antes de enviar nada a Firebase, ahorrando ancho de banda y latencia.
+    </p>
+    <img src="../assets/images/8.jpeg" class="screenshot">
+
+    <h2>5.4 ForgotPasswordScreen</h2>
+    <p>
+        Una pantalla minimalista que llama a <code>authService.sendPasswordResetEmail(email)</code>. Firebase se encarga de enviar el correo con el enlace mágico.
+    </p>
+    <img src="../assets/images/9.jpeg" class="screenshot">
+
+    <h2>5.5 Persistencia de Sesión (AuthWrapper)</h2>
+    <p>
+        Una de las características más críticas de una app móvil es que el usuario no tenga que loguearse cada vez que abre la app.
+        Esto se logra en el widget raíz <code>AuthWrapper</code> (en main.dart).
+    </p>
+    <pre>
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Escucha activa del estado de autenticación
+    final auth = context.watch&lt;AuthProvider&gt;();
+    
+    // Switch automático de pantallas
+    if (auth.isAuthenticated) {
+      return const HomeScreen();
+    }
+    return const LoginScreen();
+  }
+}
+    </pre>
+    <div class="defense-tip">
+        <strong>DEFENSA:</strong> "Este router dinámico reacciona en tiempo real. Si el usuario cierra sesión, `isAuthenticated` pasa a falso y la app lo expulsa inmediatamente a la pantalla de Login, sin necesidad de hacer `Navigator.push` manuales propenso a errores."
+    </div>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 6: WIDGETS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 6: INGENIERÍA DE COMPONENTES (WIDGETS)</h1>
+    <p>
+        La atomización de la interfaz. Extraemos lógica repetitiva a widgets pequeños.
+    </p>
+
+    <h2>6.1 SongTileWidget</h2>
+    <p>
+        Este widget es la célula básica de la app.
+    </p>
+    <ul>
+        <li><strong>Leading:</strong> Muestra la carátula. Usamos <code>ClipRRect</code> para redondear las esquinas de la imagen.</li>
+        <li><strong>Trailing:</strong> Muestra botones contextuales (Editar/Borrar) <strong>SOLO SI</strong> la canción pertenece al usuario actual (`if (song.userId == currentUserId)`). Esta lógica condicional es clave para la seguridad visual.</li>
+    </ul>
+    <pre>
+// Lógica de visualización de botones de admin
+trailing: isOwner 
+  ? Row(mainAxisSize: MainAxisSize.min, children: [EditBtn, DeleteBtn])
+  : LikeButton(),
+    </pre>
+    <img src="../assets/images/10.jpeg" class="screenshot">
+
+    <h2>6.2 PlaylistCardWidget</h2>
+    <p>
+        Usado en el GridView. Utiliza un widget <code>Stack</code> para superponer texto sobre imagen.
+        Para asegurar que el texto blanco se lea sobre cualquier imagen, añadimos un <strong>Gradiente Negro</strong> (Shader) en la parte inferior de la tarjeta.
+    </p>
+    <pre>
+Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Colors.transparent, Colors.black87],
+    ),
+  ),
+)
+    </pre>
+    <img src="../assets/images/12.jpeg" class="screenshot">
+
+    <h2>6.3 AudioWidgets</h2>
+    <p>
+        Componentes de la barra de reproducción. El slider no es nativo estándar; está personalizado para que el "thumb" (la bolita) sea del color primario y el "track" inactivo sea gris oscuro.
+    </p>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 7: SCREENS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 7: INGENIERÍA DE PANTALLAS (CORE UI)</h1>
+    <p>El ensamblaje final de la aplicación.</p>
+
+    <h2>7.1 HomeScreen: Shell y Tabs</h2>
+    <p>
+        La pantalla principal (`HomeScreen`) actúa como un "Shell" (Cascarón).
+        Utiliza un <code>BottomNavigationBar</code> para movernos entre secciones.
+        Lo crítico aquí es el uso de <code>IndexedStack</code>.
+    </p>
+    <div class="defense-tip">
+        <strong>DEFENSA:</strong> "Si usara una navegación normal, al cambiar de tab 'Home' a 'Playlists', se destruiría la página Home. Con IndexedStack, mantenemos ambas vivas en memoria, haciendo el cambio instantáneo y guardando la posición del scroll."
+    </div>
+    <img src="../assets/images/11.jpeg" class="screenshot">
+
+    <h2>7.2 PlaylistsScreen: Grids Responsivos</h2>
+    <p>
+        Usamos <code>GridView.builder</code>. Definimos un delegado fijo <code>SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2)</code> para tener siempre dos columnas, ideal para móvil.
+    </p>
+    <img src="../assets/images/12.jpeg" class="screenshot">
+
+    <h2>7.3 SongDetailScreen: AudioLogic</h2>
+    <p>
+        Esta es la pantalla más compleja en estado. Interactúa con el paquete <code>audioplayers</code>.
+    </p>
+    <h3>Ciclo de Vida (Lifecycle):</h3>
+    <ul>
+        <li><strong>initState():</strong> Cargamos la URL del audio y nos suscribimos al stream `onPositionChanged`.</li>
+        <li><strong>dispose():</strong> ¡CRÍTICO! Debemos llamar a `player.dispose()` al cerrar la pantalla. Si no, la música seguiría sonando en segundo plano "fantasma" consumiendo batería.</li>
+    </ul>
+    <img src="../assets/images/13.jpeg" class="screenshot">
+
+    <h2>7.4 PlaylistDetailScreen: Slivers</h2>
+    <p>
+        Para un efecto visual premium, usamos <strong>Slivers</strong>.
+        <code>SliverAppBar</code> permite que la imagen de la playlist se expanda al estirar la lista hacia abajo y se contraiga en una barra pequeña al hacer scroll hacia arriba.
+    </p>
+    <p>
+        Además, hacemos un "Join" lógico manual: leemos el array de IDs de la playlist y filtramos la lista global de canciones para mostrar solo las coincidentes.
+    </p>
+    <img src="../assets/images/14.jpeg" class="screenshot">
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 8: RECURSOS (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 8: RECURSOS Y CREACIÓN</h1>
+
+    <h2>8.1 SongFormScreen</h2>
+    <p>
+        Pantalla unificada para Crear y Editar.
+        Usa <code>FilePicker</code> para seleccionar archivos mp3 y jpg del almacenamiento local.
+    </p>
+
+    <h2>8.2 Subida Dual (Algoritmo de 3 pasos)</h2>
+    <p>
+        El proceso de guardar no es atómico.
+    </p>
+    <ol>
+        <li><strong>Paso 1:</strong> Subir Imagen a Firebase Storage -> Obtener URL `imgUrl`.</li>
+        <li><strong>Paso 2:</strong> Subir Audio a Firebase Storage -> Obtener URL `audioUrl`.</li>
+        <li><strong>Paso 3:</strong> Crear documento en Firestore con `{ title: ..., audio: audioUrl, image: imgUrl }`.</li>
+    </ol>
+    <p>Todo envuelto en un bloque <code>try/catch</code> para gestionar fallos de red a mitad de subida.</p>
+    
+    <!-- ============================================== -->
+    <!-- BLOQUE 9: CRUD (COMPLETO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 9: GESTIÓN CRUD Y CIERRE</h1>
+    <p>
+        El ciclo de vida del dato no termina en la creación. La gestión de la modificación (Update) y eliminación (Delete) es donde la mayoría de apps fallan.
+        Aquí analizamos cómo MelodyVault maneja estas operaciones críticas.
+    </p>
+
+    <h2>9.1 Edición Inmutable ("The Update Problem")</h2>
+    <p>
+        Editar en Flutter es complejo porque los datos antiguos deben pre-llenar el formulario.
+    </p>
+    <h3>Paso de Argumentos</h3>
+    <p>
+        El constructor de `SongFormScreen` acepta un parámetro opcional `final Song? song`.
+        En el <code>initState</code>, preguntamos: "¿Me han pasado una canción?".
+    </p>
+    <pre>
+@override
+void initState() {
+  super.initState();
+  if (widget.song != null) {
+    // ESTADO DE EDICIÓN: Prelleno los controladores
+    _titleController.text = widget.song!.title;
+    _artistController.text = widget.song!.artist;
+    // Guardo las URLs viejas por si el usuario no sube archivos nuevos
+    _imageUrl = widget.song!.imageUrl;
+  }
+}
+    </pre>
+    <div class="defense-tip">
+        <strong>DEFENSA:</strong> "Esta técnica permite usar UNA SOLA pantalla para dos casos de uso (Alta y Modificación), reduciendo la base de código a la mitad y facilitando el mantenimiento."
+    </div>
+
+    <h2>9.2 Borrado en Cascada (Cascade Deletion)</h2>
+    <p>
+        Un error de novato es borrar el documento de la base de datos (`firestore.delete()`) pero dejar los archivos de audio e imagen en el Storage. Esto crea "archivos huérfanos" que ocupan espacio y cuestan dinero.
+    </p>
+    <p>
+        <strong>Nuestra Solución Robusta:</strong>
+        Antes de borrar el registro en Firestore, capturamos las URLs de los archivos y ordenamos su destrucción en el Storage.
+    </p>
+    <pre>
+Future&lt;void&gt; deleteSong(Song song) async {
+  // 1. Borrar Ficheros Físicos (Limpieza)
+  if (song.imageUrl.isNotEmpty) {
+    await _storage.refFromURL(song.imageUrl).delete();
+  }
+  if (song.audioUrl.isNotEmpty) {
+    await _storage.refFromURL(song.audioUrl).delete();
+  }
+  // 2. Borrar Registro Lógico
+  await _firestore.collection('songs').doc(song.id).delete();
+}
+    </pre>
+
+    <h2>9.3 Widget Dismissible (UX de Deslizamiento)</h2>
+    <p>
+        Para el borrado, evitamos el típico botón "Papelera". Implementamos el patrón moderno "Swipe to Delete" usando el widget nativo <code>Dismissible</code>.
+    </p>
+
+    <h3>Anatomía del Deslizamiento:</h3>
+    <ul>
+        <li><strong>Key:</strong> `Key(song.id)`. Esencial para que Flutter sepa qué elemento exacto de la lista se está animando. Sin esto, borraríamos el elemento equivocado.</li>
+        <li><strong>Background:</strong> Un contenedor ROJO (`Colors.red`) con un icono de basura blanco alineado a la derecha. Esto da feedback visual inmediato de "Peligro/Borrado".</li>
+        <li><strong>Direction:</strong> `DismissDirection.endToStart`. Solo permitimos deslizar de derecha a izquierda (estándar occidental).</li>
+    </ul>
+
+    <h3>Confirmación de Seguridad (confirmDismiss)</h3>
+    <p>
+        El deslizamiento es fácil de hacer por error. Por eso interceptamos la acción con <code>confirmDismiss</code>.
+    </p>
+    <pre>
+confirmDismiss: (direction) async {
+  return await showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text('¿Borrar canción?'),
+      content: Text('Esta acción es irreversible y eliminará los archivos.'),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('CANCELAR')),
+        TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('BORRAR')),
+      ],
+    ),
+  );
+}
+    </pre>
+    <img src="../assets/images/15.jpeg" class="screenshot">
+
+    <h2>9.4 Gestión de Favoritos (Subcolecciones)</h2>
+    <p>
+        Para los favoritos, no usamos un array simple en el documento del usuario. Usamos el patrón de <strong>Subcolecciones</strong>.
+        La ruta es: <code>users/{userId}/favorites/{songId}</code>.
+    </p>
+    <p>
+        <strong>¿Por qué Subcolecciones?</strong>
+    </p>
+    <ul>
+        <li><strong>Rendimiento:</strong> Si un usuario tiene 5,000 canciones favoritas y usamos un array, tendríamos que descargar un documento gigante cada vez. Con subcolecciones, cargamos los favoritos bajo demanda.</li>
+        <li><strong>Escalabilidad:</strong> Un documento de Firestore tiene un límite de 1MB. Una subcolección es infinita.</li>
+    </ul>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 10: OPTIMIZACIONES Y UX (NUEVO) -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1 style="color: var(--opt-color);">BLOQUE 10: OPTIMIZACIONES Y UX AVANZADA</h1>
+    <p>
+        Más allá de que "funcione", una app de 10 debe ser eficiente y agradable. Hemos implementado optimizaciones técnicas que marcan la diferencia.
+    </p>
+
+    <h2>10.1 Gestión de Memoria con CachedNetworkImage</h2>
+    <p>
+        Una app de música carga muchas carátulas. Si usáramos <code>Image.network</code> estándar, cada vez que hacemos scroll la app volvería a descargar la imagen, gastando datos y batería.
+    </p>
+    <p>
+        <strong>Solución:</strong> Usamos la librería <code>cached_network_image</code>.
+        Esto guarda las imágenes en la caché local del dispositivo. Si el usuario vuelve a ver la misma canción, la carga es instantánea y offline.
+    </p>
+    <pre>
+CachedNetworkImage(
+  imageUrl: song.imageUrl,
+  placeholder: (context, url) => ShimmerLoading(), // Efecto de carga elegante
+  errorWidget: (context, url, error) => Icon(Icons.error),
+),
+    </pre>
+
+    <h2>10.2 Búsqueda Animada (AnimatedSearchBar)</h2>
+    <p>
+        En lugar de incrustar un campo de texto gigante que ocupa toda la AppBar, hemos creado un widget <code>AnimatedSearchBar</code>.
+    </p>
+    <p>
+        Al pulsar la lupa, el campo se expande con una animación suave (`AnimatedContainer` de 300ms). Esto es un uso avanzado de <strong>Animaciones Implícitas</strong> de Flutter, mejorando la percepción de calidad de la app.
+    </p>
+    
+     <img src="../assets/images/16.jpeg" class="screenshot">
+
+    <h2>10.3 Manejo de Estados Vacíos (EmptyStateWidget)</h2>
+    <p>
+        Una pantalla blanca es un error de diseño. Si no hay canciones, mostramos un <code>EmptyStateWidget</code> con un icono grande y una invitación a la acción ("¡Añade tu primera canción!").
+        Esto guía al usuario y evita la sensación de "app rota".
+    </p>
+
+    <!-- ============================================== -->
+    <!-- BLOQUE 11: CONCLUSIONES Y FUTURO -->
+    <!-- ============================================== -->
+    <div class="page-break"></div>
+    <h1>BLOQUE 11: CONCLUSIONES Y FUTURO</h1>
+
+    <h2>11.1 Conclusiones Técnicas</h2>
+    <p>
+        MelodyVault cumple estrictamente con la arquitectura <strong>Productor-Consumidor (Provider)</strong> y separa limpiamente la lógica de negocio (Servicios) de la interfaz (Widgets).
+        Hemos priorizado la robustez (manejo de errores, modo offline con caché) y la <strong>Separación de Responsabilidades (Separation of Concerns)</strong>: la UI solo pinta, el Provider gestiona el estado, y el Servicio habla con la nube.
+    </p>
+
+    <h2>11.2 Líneas Futuras de Desarrollo</h2>
+    <p>
+        Si el proyecto continuara, los siguientes pasos naturales serían:
+    </p>
+    <ul>
+        <li><strong>Modo Offline Real:</strong> Descargar MP3s localmente (usando `sqflite` para persistencia).</li>
+        <li><strong>Backend Cloud Functions:</strong> Mover el borrado de archivos al servidor para mayor seguridad.</li>
+        <li><strong>Web Admin Panel:</strong> Una versión web en Flutter Web para administradores.</li>
+    </ul>
+
+
+
+</body>
+</html>
+

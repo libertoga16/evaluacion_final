@@ -203,7 +203,7 @@ class _AddSongSheetState extends State<_AddSongSheet> {
         ),
         Expanded(
           child: StreamBuilder<List<Song>>(
-            stream: context.read<MusicProvider>().songsStream,
+             stream: context.read<MusicProvider>().getSongsStream(context.read<AuthProvider>().userId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
               final allSongs = snapshot.data ?? [];

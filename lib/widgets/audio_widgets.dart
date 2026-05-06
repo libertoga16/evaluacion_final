@@ -124,7 +124,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 }
 
-class FavoriteButton extends StatelessWidget {
+class FavoriteButton extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback onTap;
   final double size;
@@ -132,14 +132,61 @@ class FavoriteButton extends StatelessWidget {
   const FavoriteButton({super.key, required this.isFavorite, required this.onTap, this.size = 24});
 
   @override
+  State<FavoriteButton> createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void didUpdateWidget(FavoriteButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFavorite != oldWidget.isFavorite && widget.isFavorite) {
+      _controller.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return IconButton(
-      iconSize: size,
-      icon: Icon(
-        isFavorite ? Icons.favorite : Icons.favorite_border,
-        color: isFavorite ? AppColors.primary : AppColors.textSecondary,
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) => Transform.scale(
+        scale: _scaleAnimation.value,
+        child: child,
       ),
-      onPressed: onTap,
+      child: IconButton(
+        iconSize: widget.size,
+        icon: Icon(
+          widget.isFavorite ? Icons.favorite : Icons.favorite_border,
+          color: widget.isFavorite ? AppColors.primary : AppColors.textSecondary,
+        ),
+        onPressed: () {
+          widget.onTap();
+          if (!widget.isFavorite) {
+            _controller.forward(from: 0.0);
+          }
+        },
+      ),
     );
   }
 }

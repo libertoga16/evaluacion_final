@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -49,7 +51,26 @@ class AuthService {
     if (user != null) {
       await user.updateDisplayName(name);
       await user.reload();
-      await _firestore.collection('users').doc(user.uid).update({'displayName': name});
+      await _firestore.collection('users').doc(user.uid).set(
+        {'displayName': name},
+        SetOptions(merge: true),
+      );
+    }
+  }
+
+  Future<void> updateProfilePicture(File imageFile) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final ref = FirebaseStorage.instance.ref().child('profiles/${user.uid}.jpg');
+      await ref.putFile(imageFile);
+      final downloadUrl = await ref.getDownloadURL();
+      
+      await user.updatePhotoURL(downloadUrl);
+      await user.reload();
+      await _firestore.collection('users').doc(user.uid).set(
+        {'imageUrl': downloadUrl},
+        SetOptions(merge: true),
+      );
     }
   }
 }

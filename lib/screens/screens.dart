@@ -7,3 +7,4 @@ export 'song_detail_screen.dart';
 export 'playlists_screen.dart';
 export 'playlist_form_screen.dart';
 export 'playlist_detail_screen.dart';
+export 'itunes_search_screen.dart';

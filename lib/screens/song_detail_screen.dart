@@ -5,6 +5,7 @@ import '../../config/app_theme.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/music_provider.dart';
+import '../../providers/audio_player_provider.dart';
 import '../../widgets/widgets.dart';
 import 'song_form_screen.dart';
 
@@ -37,9 +38,12 @@ class SongDetailScreen extends StatelessWidget {
               ],
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: song.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(imageUrl: song.imageUrl, fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken)
-                  : Container(color: AppColors.surfaceLight, child: const Icon(Icons.music_note, size: 100, color: AppColors.textMuted)),
+              background: Hero(
+                tag: 'album_art_${song.title}_${song.imageUrl.isNotEmpty ? song.imageUrl : "default"}',
+                child: song.imageUrl.isNotEmpty
+                    ? CachedNetworkImage(imageUrl: song.imageUrl, fit: BoxFit.cover, color: Colors.black45, colorBlendMode: BlendMode.darken)
+                    : Container(color: AppColors.surfaceLight, child: const Icon(Icons.music_note, size: 100, color: AppColors.textMuted)),
+              ),
             ),
           ),
           SliverToBoxAdapter(
@@ -66,7 +70,7 @@ class SongDetailScreen extends StatelessWidget {
                       ),
                     )
                   else if (song.audioUrl.isNotEmpty) 
-                    AudioPlayerWidget(audioUrl: song.audioUrl, autoPlay: true)
+                    _buildFullScreenPlayer(context, song)
                   else
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -149,5 +153,73 @@ class SongDetailScreen extends StatelessWidget {
       await context.read<MusicProvider>().deleteSong(id);
       Navigator.pop(context);
     }
+  }
+
+  Widget _buildFullScreenPlayer(BuildContext context, Song song) {
+    final audioProvider = context.watch<AudioPlayerProvider>();
+    final isCurrentSong = audioProvider.currentSong?.id == song.id;
+    final isPlaying = isCurrentSong && audioProvider.isPlaying;
+    final position = isCurrentSong ? audioProvider.position : Duration.zero;
+    final duration = isCurrentSong ? audioProvider.duration : Duration.zero;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(50), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Visualizador de audio animado
+          AudioVisualizer(isPlaying: isPlaying),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                iconSize: 72,
+                icon: Icon(
+                  isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                  color: AppColors.primary,
+                ),
+                onPressed: () => context.read<AudioPlayerProvider>().playSong(song),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+              trackHeight: 6,
+            ),
+            child: Slider(
+              value: position.inSeconds.toDouble().clamp(0, duration.inSeconds.toDouble() > 0 ? duration.inSeconds.toDouble() : 1),
+              max: duration.inSeconds.toDouble() > 0 ? duration.inSeconds.toDouble() : 1,
+              activeColor: AppColors.primary,
+              inactiveColor: AppColors.surface,
+              onChanged: (v) {
+                if (isCurrentSong) {
+                  context.read<AudioPlayerProvider>().seek(Duration(seconds: v.toInt()));
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(context.read<AudioPlayerProvider>().formatDuration(position), style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                Text(context.read<AudioPlayerProvider>().formatDuration(duration), style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

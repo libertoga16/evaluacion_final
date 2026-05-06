@@ -10,6 +10,7 @@ class Song {
   final String imageUrl;
   final String audioUrl;
   final bool isDefault;
+  final bool isPublic;
   final String createdBy;
   final DateTime createdAt;
 
@@ -23,6 +24,7 @@ class Song {
     this.imageUrl = '',
     this.audioUrl = '',
     this.isDefault = false,
+    this.isPublic = true,
     this.createdBy = 'system',
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
@@ -39,6 +41,7 @@ class Song {
       imageUrl: data['imageUrl'] ?? '',
       audioUrl: data['audioUrl'] ?? '',
       isDefault: data['isDefault'] ?? false,
+      isPublic: data['isPublic'] ?? true, // Si no existe (antiguas), asumimos true
       createdBy: data['createdBy'] ?? 'system',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -54,6 +57,7 @@ class Song {
       'imageUrl': imageUrl,
       'audioUrl': audioUrl,
       'isDefault': isDefault,
+      'isPublic': isPublic,
       'createdBy': createdBy,
       'createdAt': Timestamp.fromDate(createdAt),
     };
@@ -69,6 +73,7 @@ class Song {
     String? imageUrl,
     String? audioUrl,
     bool? isDefault,
+    bool? isPublic,
     String? createdBy,
   }) {
     return Song(
@@ -81,6 +86,7 @@ class Song {
       imageUrl: imageUrl ?? this.imageUrl,
       audioUrl: audioUrl ?? this.audioUrl,
       isDefault: isDefault ?? this.isDefault,
+      isPublic: isPublic ?? this.isPublic,
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt,
     );

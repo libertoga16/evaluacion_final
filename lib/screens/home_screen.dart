@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_theme.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
@@ -8,6 +10,11 @@ import '../../widgets/widgets.dart';
 import 'song_form_screen.dart';
 import 'song_detail_screen.dart';
 import 'playlists_screen.dart';
+import 'social_screen.dart';
+import 'edit_profile_screen.dart';
+import 'connections_screen.dart';
+import '../widgets/mini_player.dart';
+import '../../providers/social_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,9 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: const [SongsTab(), PlaylistsScreen(), ProfileTab()],
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: const [SongsTab(), PlaylistsScreen(), SocialScreen(), ProfileTab()],
+          ),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: GlobalMiniPlayer(),
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -47,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.library_music_rounded), label: 'Biblioteca'),
             BottomNavigationBarItem(icon: Icon(Icons.queue_music_rounded), label: 'Playlists'),
+            BottomNavigationBarItem(icon: Icon(Icons.people_alt_rounded), label: 'Descubrir'),
             BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Perfil'),
           ],
         ),
@@ -70,7 +88,14 @@ class _SongsTabState extends State<SongsTab> {
     final userId = context.watch<AuthProvider>().userId;
     
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(color: AppColors.background.withAlpha(180)),
+          ),
+        ),
         title: const Text('Biblioteca'),
         actions: [
           IconButton(
@@ -90,7 +115,7 @@ class _SongsTabState extends State<SongsTab> {
         ],
       ),
       body: StreamBuilder<List<Song>>(
-        stream: context.read<MusicProvider>().songsStream,
+        stream: context.read<MusicProvider>().getSongsStream(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return ListView.builder(
@@ -139,7 +164,7 @@ class _SongsTabState extends State<SongsTab> {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.only(bottom: 80, top: 8),
+            padding: EdgeInsets.only(bottom: 80, top: MediaQuery.of(context).padding.top + kToolbarHeight + 8),
             itemCount: songs.length,
             separatorBuilder: (_, __) => Divider(color: AppColors.divider.withAlpha(50), height: 1, indent: 76),
             itemBuilder: (context, index) {
@@ -193,11 +218,19 @@ class ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(
+        title: const Text('Perfil'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
           Center(
             child: Container(
               decoration: BoxDecoration(
@@ -206,11 +239,14 @@ class ProfileTab extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: 56,
-                backgroundColor: AppColors.primary,
-                child: Text(
-                  auth.displayName.isNotEmpty ? auth.displayName[0].toUpperCase() : 'U',
-                  style: const TextStyle(fontSize: 48, color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+                backgroundColor: AppColors.surfaceLight,
+                backgroundImage: auth.imageUrl.isNotEmpty ? CachedNetworkImageProvider(auth.imageUrl) : null,
+                child: auth.imageUrl.isEmpty 
+                    ? Text(
+                        auth.displayName.isNotEmpty ? auth.displayName[0].toUpperCase() : 'U',
+                        style: const TextStyle(fontSize: 48, color: AppColors.textMuted, fontWeight: FontWeight.bold),
+                      )
+                    : null,
               ),
             ),
           ),
@@ -218,8 +254,41 @@ class ProfileTab extends StatelessWidget {
           Text(auth.displayName, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
           const SizedBox(height: 4),
           Text(auth.email, style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
-          const SizedBox(height: 48),
+          const SizedBox(height: 32),
           
+          StreamBuilder<UserProfile>(
+            stream: context.read<SocialProvider>().getUserProfile(auth.userId),
+            builder: (context, snapshot) {
+              final userProfile = snapshot.data;
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => ConnectionsScreen(
+                        userId: auth.userId, 
+                        title: 'Tus Seguidores', 
+                        isFollowers: true,
+                      )));
+                    },
+                    child: _buildStatColumn('Seguidores', userProfile?.followersCount.toString() ?? '0'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => ConnectionsScreen(
+                        userId: auth.userId, 
+                        title: 'Siguiendo', 
+                        isFollowers: false,
+                      )));
+                    },
+                    child: _buildStatColumn('Siguiendo', userProfile?.followingCount.toString() ?? '0'),
+                  ),
+                ],
+              );
+            }
+          ),
+
+          const SizedBox(height: 32),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(color: AppColors.surfaceLight, borderRadius: BorderRadius.circular(16)),
@@ -237,6 +306,15 @@ class ProfileTab extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
+      ],
     );
   }
 

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
@@ -15,6 +16,7 @@ class AuthProvider extends ChangeNotifier {
   String get userId => _user?.uid ?? '';
   String get displayName => _user?.displayName ?? _user?.email?.split('@')[0] ?? 'Usuario';
   String get email => _user?.email ?? '';
+  String get imageUrl => _user?.photoURL ?? '';
 
   AuthProvider() {
     _authService.authStateChanges.listen((User? user) {
@@ -61,6 +63,29 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _error = _mapFirebaseError(e);
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> updateProfile({String? name, File? imageFile}) async {
+    _setLoading(true);
+    try {
+      if (name != null && name.isNotEmpty) {
+        await _authService.updateDisplayName(name);
+      }
+      if (imageFile != null) {
+        await _authService.updateProfilePicture(imageFile);
+      }
+      
+      // Forzar actualización local del usuario
+      _user = FirebaseAuth.instance.currentUser;
+      notifyListeners();
+      
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _error = e.toString();
       _setLoading(false);
       return false;
     }

@@ -27,7 +27,7 @@ class MusicProvider extends ChangeNotifier {
   String? get error => _error;
   List<String> get favoriteIds => _favoriteIds;
 
-  Stream<List<Song>> get songsStream => _songService.getSongs();
+  Stream<List<Song>> getSongsStream(String userId) => _songService.getSongs(userId);
   Stream<List<Playlist>> getUserPlaylists(String userId) => _playlistService.getUserPlaylists(userId);
   Stream<Playlist?> getPlaylistStream(String id) => _playlistService.getPlaylistStream(id);
 

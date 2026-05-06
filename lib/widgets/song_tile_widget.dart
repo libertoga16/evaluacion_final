@@ -32,18 +32,21 @@ class SongTileWidget extends StatelessWidget {
       onTap: onTap,
       leading: Stack(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: imageUrl != null && imageUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: imageUrl!,
-                    width: 52,
-                    height: 52,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => _buildPlaceholder(),
-                    errorWidget: (_, __, ___) => _buildPlaceholder(),
-                  )
-                : _buildPlaceholder(),
+          Hero(
+            tag: 'album_art_${title}_${imageUrl ?? "default"}', // Generando un ID único aproximado ya que no tenemos el ID directo de la canción aquí
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: imageUrl != null && imageUrl!.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl!,
+                      width: 52,
+                      height: 52,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => _buildPlaceholder(),
+                      errorWidget: (_, __, ___) => _buildPlaceholder(),
+                    )
+                  : _buildPlaceholder(),
+            ),
           ),
           if (isDefault)
             Positioned(

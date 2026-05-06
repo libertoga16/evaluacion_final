@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typography Spec Sheet</title>
+    <!-- Outfit Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #FFFFFF;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .spec-card {
+            background-color: #181818;
+            padding: 40px;
+            border-radius: 24px;
+            width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1DB954; /* Spotify Green */
+            margin: 0;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777777;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .weights {
+            margin: 30px 0;
+        }
+
+        .weight-item {
+            margin-bottom: 15px;
+        }
+
+        .weight-light { font-weight: 300; font-size: 20px; color: #B3B3B3; }
+        .weight-regular { font-weight: 400; font-size: 20px; color: #FFFFFF; }
+        .weight-bold { font-weight: 700; font-size: 20px; color: #FFFFFF; }
+        .weight-extra { font-weight: 800; font-size: 20px; color: #1DB954; }
+
+        .palette-title {
+            font-size: 12px;
+            color: #777777;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .palette {
+            display: flex;
+            gap: 15px;
+        }
+
+        .swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+        }
+
+        .green { background: #1DB954; }
+        .dark { background: #121212; border-color: #333; }
+        .error { background: #E91E63; }
+    </style>
+</head>
+<body>
+    <div class="spec-card">
+        <div class="header">
+            <div class="subtitle">TYPEFACE SPEC SHEET</div>
+            <h1>Google Fonts Outfit</h1>
+        </div>
+
+        <div class="weights">
+            <div class="weight-item weight-light">Aa Bb Cc - Light (300)</div>
+            <div class="weight-item weight-regular">Aa Bb Cc - Regular (400)</div>
+            <div class="weight-item weight-bold">Aa Bb Cc - Bold (700)</div>
+            <div class="weight-item weight-extra">Aa Bb Cc - ExtraBold (800)</div>
+        </div>
+
+        <div class="palette-title">System Colors</div>
+        <div class="palette">
+            <div class="swatch green" title="#1DB954"></div>
+            <div class="swatch dark" title="#121212"></div>
+            <div class="swatch error" title="#E91E63"></div>
+        </div>
+    </div>
+</body>
+</html>

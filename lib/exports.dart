@@ -1,6 +1,13 @@
 export 'config/app_theme.dart';
 export 'models/models.dart';
 export 'providers/providers.dart';
+export 'providers/audio_player_provider.dart';
 export 'services/services.dart';
 export 'widgets/widgets.dart';
+export 'widgets/mini_player.dart';
+export 'widgets/audio_visualizer.dart';
+export 'screens/social_screen.dart';
+export 'screens/user_profile_screen.dart';
+export 'screens/edit_profile_screen.dart';
+export 'screens/connections_screen.dart';
 export 'screens/screens.dart';

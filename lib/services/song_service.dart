@@ -10,9 +10,11 @@ class SongService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   static const String _collection = 'songs';
 
-  Stream<List<Song>> getSongs() {
+  Stream<List<Song>> getSongs(String currentUserId) {
     return _firestore.collection(_collection).orderBy('title').snapshots()
-        .map((s) => s.docs.map((d) => Song.fromFirestore(d)).toList());
+        .map((s) => s.docs.map((d) => Song.fromFirestore(d)).where((song) {
+          return song.isPublic || song.createdBy == currentUserId || song.isDefault;
+        }).toList());
   }
 
   Future<List<Song>> getSongsList() async {

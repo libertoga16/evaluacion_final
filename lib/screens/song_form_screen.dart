@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/music_provider.dart';
 import '../../widgets/widgets.dart';
+import 'itunes_search_screen.dart';
 
 class SongFormScreen extends StatefulWidget {
   final Song? song;
@@ -27,6 +28,7 @@ class _SongFormScreenState extends State<SongFormScreen> {
   File? _audioFile;
   String? _audioFileName;
   bool _isLoading = false;
+  bool _isPublic = true;
 
   bool get isEditing => widget.song != null;
 
@@ -38,6 +40,7 @@ class _SongFormScreenState extends State<SongFormScreen> {
     _albumController = TextEditingController(text: widget.song?.album ?? '');
     _durationController = TextEditingController(text: widget.song?.duration ?? '');
     _selectedGenre = widget.song?.genre;
+    _isPublic = widget.song?.isPublic ?? true;
   }
 
   @override
@@ -82,6 +85,7 @@ class _SongFormScreenState extends State<SongFormScreen> {
       imageUrl: widget.song?.imageUrl ?? '',
       audioUrl: widget.song?.audioUrl ?? '',
       isDefault: false,
+      isPublic: _isPublic,
       createdBy: widget.song?.createdBy ?? userId,
     );
 
@@ -116,6 +120,37 @@ class _SongFormScreenState extends State<SongFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            if (!isEditing) ...[
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ItunesSearchScreen())),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.purple.shade700, Colors.blue.shade700]),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [BoxShadow(color: Colors.purple.withAlpha(50), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cloud_download, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Buscar en Nube Global (iTunes)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.surfaceLight)),
+                    Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('O SUBIR MANUALMENTE', style: TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.bold))),
+                    Expanded(child: Divider(color: AppColors.surfaceLight)),
+                  ],
+                ),
+              ),
+            ],
             GestureDetector(
               onTap: _pickImage,
               child: Container(
@@ -194,6 +229,21 @@ class _SongFormScreenState extends State<SongFormScreen> {
                 ),
               ),
             ]),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SwitchListTile(
+                title: const Text('Canción pública'),
+                subtitle: Text(_isPublic ? 'Visible para todos los usuarios' : 'Solo visible para ti', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                value: _isPublic,
+                activeColor: AppColors.primary,
+                secondary: Icon(_isPublic ? Icons.public : Icons.lock, color: AppColors.primary),
+                onChanged: (v) => setState(() => _isPublic = v),
+              ),
+            ),
             const SizedBox(height: 48),
             Center(
               child: GradientButton(
